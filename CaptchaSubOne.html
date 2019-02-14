@@ -1,0 +1,139 @@
+﻿<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="Content/bootstrap.min.css">
+    <script src="Scripts/jquery-1.10.2.min.js"></script>
+    <script src="Scripts/bootstrap.min.js"></script>
+    <link rel="stylesheet" href="Content/Site.css" />
+    
+    <script type="text/javascript">
+        var secondsLabel ;
+        var totalMaxSeconds = 20; // Change total time for this round
+        var totalSeconds = totalMaxSeconds; 
+
+        var imageId = 1; // starting image no
+        var imageIdEnd = 5; //Ending image no
+        var myData = new Array();
+        var captchaTimer;
+
+        function startTheRound(){
+            secondsLabel = document.getElementById("secondsSpan");
+            captchaTimer = setInterval(timerTick, 1000);
+            loadNewImage();
+        }
+        
+        function loadNewImage(){
+            document.getElementById("captchaImage").src = 'images/image' + imageId + '.jpg';
+            ++imageId;
+        }
+
+        function timerTick() {
+            --totalSeconds;
+            if(totalSeconds>0)
+            {
+                UpdateProgressBar();
+                secondsLabel.innerHTML = pad(totalSeconds % 60);            
+            }
+            else {
+                
+                //Times up load next page
+                console.log(myData);
+                clearInterval(captchaTimer);
+                loadNextPage();
+            }
+        }
+
+        function loadNextPage(){
+            window.location.href = "Success.html";
+        }
+
+
+        function pad(val) {
+            var valString = val + "";
+            if (valString.length < 2) {
+                return "0" + valString;
+            }
+            else {
+                return valString;
+            }
+        }
+        function captchaKeyUp(event) {
+            if (event.keyCode == 13) //13 to handle enter key
+            {
+                captchaEntered();
+            }
+        }
+
+        function captchaEntered() {
+            myData[imageId - 1] = [imageId - 1, document.getElementById("captchaInput").value];
+            //clear the input
+            document.getElementById("captchaInput").value = "";
+            if (imageId < imageIdEnd) {
+                loadNewImage();
+            }
+            else {
+                console.log(myData);
+                
+                //Images are over , load next page
+                clearInterval(captchaTimer);
+                loadNextPage();
+            }
+        }
+
+        function UpdateProgressBar() {
+            var textSeconds = pad(totalSeconds % 60);
+            var percent = (totalMaxSeconds - totalSeconds) * 100  / totalMaxSeconds;
+
+            var progressBar = document.getElementById("captchaProgressBar");
+            $('.progress-bar').css('width', percent + '%').attr('aria-valuenow', percent);
+        }
+
+    </script>
+
+        <title> Captcha Sub round 1 </title>
+    </head>
+    <body onload="startTheRound()" >
+        <div class="container" style="text-align: center;">
+            <div class="row" >
+                <div class="col-sm-6 col-md-4" style="float:none;margin:0 auto">
+                    <div class="thumbnail">
+                        <div class="caption">
+                            <br />
+                            <h2>Round 3 : Rapid Fire</h2>
+
+                        </div>
+                        <div style="margin:10px">
+                            <span style="padding:10px"> Captcha : </span>
+                            <img id="captchaImage" alt="Captcha Image" style="display:inline" />
+                        </div>
+                        <input style="margin:10px" id="captchaInput" autofocus onkeyup="captchaKeyUp(event)" />
+
+                            <br />
+                        <p><button style="margin:10px" onclick="captchaEntered()" class="btn btn-primary" role="button">Next</button></p>
+                        <div style="margin:40px 0 0" >
+                            <h3> Time Remaining </h3>
+                            <div class="progress">
+                                <div id="captchaProgressBar" class="progress-bar progress-bar-info progress-bar-striped active" role="progressbar"
+                                     aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style="width:0%">
+                                    
+                                </div>
+
+                            </div>
+
+                            <div >
+                                <span id="secondsSpan">20</span> &nbsp; seconds left.
+
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div>
+        </div>
+    </body>
+
+    </html>
